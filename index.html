@@ -22,7 +22,13 @@
         <a href="#how">How it works</a>
         <a href="#pricing">Pricing</a>
       </nav>
-      <a href="#fleet" class="btn btn-amber small">Book a ride</a>
+      <div class="header-actions">
+        <a href="#fleet" class="btn btn-amber small">Book a ride</a>
+        <div id="user-area" style="display:inline-block;margin-left:12px;">
+          <button id="login-btn" class="btn btn-ghost small">Login</button>
+          <button id="account-btn" class="btn btn-ghost small" style="display:none">My Bookings</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -166,8 +172,32 @@
           </select>
         </label>
         <label>
+          Start date
+          <input type="date" id="start-date" required>
+        </label>
+        <label>
+          End date
+          <input type="date" id="end-date" required>
+        </label>
+        <label>
           Number of days
           <input type="number" id="num-days" min="1" value="1" required>
+        </label>
+        <label>
+          Upload Aadhar (demo)
+          <input type="file" id="aadhar-file" accept=".png,.jpg,.jpeg,.pdf">
+        </label>
+        <label>
+          Upload Driving Licence (demo)
+          <input type="file" id="license-file" accept=".png,.jpg,.jpeg,.pdf">
+        </label>
+        <label>
+          Rating (optional)
+          <input type="number" id="rating" min="1" max="5" value="5">
+        </label>
+        <label>
+          Review (optional)
+          <textarea id="review" rows="3" placeholder="Tell others about your ride"></textarea>
         </label>
 
         <div class="total-row">
@@ -179,9 +209,22 @@
           <button type="button" class="btn btn-amber full" id="pay-btn">
             Continue to payment →
           </button>
-          <p class="razorpay-note">Click to complete payment securely via Razorpay</p>
+          <p class="razorpay-note">Click to complete payment securely via Razorpay (demo)</p>
         </div>
       </form>
+      </div>
+    </div>
+
+    <!-- Account Modal -->
+    <div class="modal-overlay" id="account-overlay">
+      <div class="modal-card" id="account-card">
+      <button class="modal-close" id="account-close" aria-label="Close">✕</button>
+      <h3>Your Bookings</h3>
+      <div id="bookings-list" style="margin-top:12px;"></div>
+      <h4 style="margin-top:18px;">Shop Reviews</h4>
+      <div id="shop-reviews" style="margin-top:8px;"></div>
+      </div>
+    </div>
     </div>
   </div>
 

@@ -230,6 +230,11 @@ p{margin:0 0 1em;color:var(--paper-dim);}
 /* =========================================================
    FOOTER
 ========================================================= */
+/* account / reviews modal tweaks */
+.modal-card#account-card{max-width:640px;}
+#bookings-list div{background:transparent}
+#shop-reviews p{margin:0 0 8px}
+
 .site-footer{padding:34px 0;}
 .footer-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
 .footer-row p{margin:0;font-size:.8rem;color:var(--steel);}

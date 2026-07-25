@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+roadpass.db
+uploads
+.env
+.env.local
+.DS_Store

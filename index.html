@@ -175,20 +175,11 @@
           <strong id="total-amount">₹500</strong>
         </div>
 
-        <!--
-          RAZORPAY PAYMENT BUTTON
-          This placeholder button ID works for testing.
-          Replace with your own button ID from Razorpay dashboard:
-          https://dashboard.razorpay.com → Payment Button
-        -->
         <div id="razorpay-button-container" class="razorpay-slot">
-          <form method="POST">
-            <script
-              src="https://checkout.razorpay.com/v1/payment-button.js"
-              data-payment_button_id="pl_IXn4hXqLWXvFrC"
-              async
-            ></script>
-          </form>
+          <button type="button" class="btn btn-amber full" id="pay-btn">
+            Continue to payment →
+          </button>
+          <p class="razorpay-note">Click to complete payment securely via Razorpay</p>
         </div>
       </form>
     </div>

@@ -116,6 +116,44 @@ tripType.addEventListener("change", updateTotal);
 numDays.addEventListener("input", updateTotal);
 
 /* =========================================================
-   PAYMENT — Razorpay Payment Button now active
+   PAYMENT — Razorpay integration
    See README.md "Step 7: Add a real payment gateway".
 ========================================================= */
+document.getElementById("pay-btn").addEventListener("click", () => {
+  const name = document.getElementById("cust-name").value;
+  const phone = document.getElementById("cust-phone").value;
+  const amount = totalAmount.textContent.replace("₹", "");
+  
+  if (!name || !phone) {
+    alert("Please fill in your name and phone number first.");
+    return;
+  }
+
+  const options = {
+    key: "YOUR_RAZORPAY_KEY_ID", // Replace with your key from Razorpay dashboard
+    amount: amount * 100, // Convert to paise
+    currency: "INR",
+    name: "RoadPass",
+    description: "Vehicle Rental Booking",
+    prefill: {
+      name: name,
+      contact: phone
+    },
+    handler: function(response) {
+      alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+    },
+    modal: {
+      ondismiss: function() {
+        alert("Payment cancelled.");
+      }
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+});
+
+// Load Razorpay script
+const script = document.createElement("script");
+script.src = "https://checkout.razorpay.com/v1/checkout.js";
+document.head.appendChild(script);

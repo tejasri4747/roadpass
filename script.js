@@ -116,19 +116,6 @@ tripType.addEventListener("change", updateTotal);
 numDays.addEventListener("input", updateTotal);
 
 /* =========================================================
-   PAYMENT — placeholder until you connect Razorpay
+   PAYMENT — Razorpay Payment Button now active
    See README.md "Step 7: Add a real payment gateway".
 ========================================================= */
-document.getElementById("placeholder-pay-btn").addEventListener("click", () => {
-  const name = document.getElementById("cust-name").value;
-  const phone = document.getElementById("cust-phone").value;
-  if (!name || !phone) {
-    alert("Please fill in your name and phone number first.");
-    return;
-  }
-  alert(
-    `This is a demo. Once you add your Razorpay Payment Button ` +
-    `(README Step 7), ${name} would be sent to a real payment ` +
-    `screen for ${totalAmount.textContent}.`
-  );
-});

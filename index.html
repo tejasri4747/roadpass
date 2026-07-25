@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoadPass — Rent Bikes, Scooty, Cars & Mini Buses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="wrap header-row">
+      <div class="brand">
+        <span class="brand-mark">RP</span>
+        <span class="brand-name">RoadPass</span>
+      </div>
+      <nav class="main-nav">
+        <a href="#fleet">Fleet</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+      <a href="#fleet" class="btn btn-amber small">Book a ride</a>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="wrap hero-row">
+      <div class="hero-copy">
+        <span class="eyebrow">Local city &amp; long distance rentals</span>
+        <h1>One pass.<br>Any vehicle.<br><span class="accent">Any distance.</span></h1>
+        <p class="lede">Bikes, scooty, cars and mini buses — pick a category, pick a vehicle, get a ticket. Flat pricing, no surprises.</p>
+        <div class="hero-actions">
+          <a href="#fleet" class="btn btn-amber">See the fleet</a>
+          <a href="#pricing" class="btn btn-ghost">View pricing</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong id="stat-count">0</strong><span>vehicles listed</span></div>
+          <div><strong>₹500</strong><span>/day within city</span></div>
+          <div><strong>₹600</strong><span>/day for 50km+</span></div>
+        </div>
+      </div>
+      <div class="hero-ticket">
+        <div class="ticket-card demo-ticket">
+          <div class="ticket-top">
+            <span class="ticket-label">RoadPass · Demo</span>
+            <span class="ticket-code">RP-0001</span>
+          </div>
+          <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=500&q=80" alt="Sample rental vehicle">
+          <div class="ticket-mid">
+            <h3>Royal Cruiser 350</h3>
+            <p class="tag">BIKE</p>
+          </div>
+          <div class="ticket-perforation"></div>
+          <div class="ticket-stub">
+            <div>
+              <span class="stub-label">Rate</span>
+              <span class="stub-value">₹500/day</span>
+            </div>
+            <div>
+              <span class="stub-label">Valid</span>
+              <span class="stub-value">Local city</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CATEGORY FILTER + FLEET ===== -->
+  <section id="fleet" class="fleet-section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The fleet</span>
+        <h2>Pick your category</h2>
+      </div>
+
+      <div class="category-tabs" id="category-tabs">
+        <button class="tab active" data-filter="all">All</button>
+        <button class="tab" data-filter="bike">Bikes</button>
+        <button class="tab" data-filter="scooty">Scooty</button>
+        <button class="tab" data-filter="car">Cars</button>
+        <button class="tab" data-filter="bus">Mini Bus</button>
+      </div>
+
+      <div class="fleet-grid" id="fleet-grid">
+        <!-- vehicle ticket cards are injected here by script.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section id="how" class="how-section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">How it works</span>
+        <h2>Three steps to the road</h2>
+      </div>
+      <div class="how-grid">
+        <div class="how-card">
+          <span class="how-num">01</span>
+          <h3>Choose a vehicle</h3>
+          <p>Filter by bike, scooty, car or mini bus and pick what fits your trip.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-num">02</span>
+          <h3>Set your distance</h3>
+          <p>Local city rides are ₹500/day. Going past 50km? That's ₹600/day.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-num">03</span>
+          <h3>Pay &amp; get your pass</h3>
+          <p>Confirm your booking and pay securely online. Your ticket is your proof of booking.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section id="pricing" class="pricing-section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Pricing</span>
+        <h2>Flat rate, every category</h2>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Within city</h3>
+          <p class="price">₹500<span>/day</span></p>
+          <p class="price-desc">Any vehicle, unlimited km inside your local city limits.</p>
+        </div>
+        <div class="price-card highlighted">
+          <h3>50km +</h3>
+          <p class="price">₹600<span>/day</span></p>
+          <p class="price-desc">Heading out of town? Same fleet, one flat outstation rate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BOOKING MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <div class="modal-ticket" id="modal-ticket-content">
+        <!-- filled by script.js -->
+      </div>
+
+      <form id="booking-form" class="booking-form">
+        <label>
+          Your name
+          <input type="text" id="cust-name" required placeholder="Full name">
+        </label>
+        <label>
+          Phone number
+          <input type="tel" id="cust-phone" required placeholder="10-digit number" pattern="[0-9]{10}">
+        </label>
+        <label>
+          Trip type
+          <select id="trip-type">
+            <option value="500">Within city — ₹500/day</option>
+            <option value="600">50km+ (outstation) — ₹600/day</option>
+          </select>
+        </label>
+        <label>
+          Number of days
+          <input type="number" id="num-days" min="1" value="1" required>
+        </label>
+
+        <div class="total-row">
+          <span>Total</span>
+          <strong id="total-amount">₹500</strong>
+        </div>
+
+        <!--
+          PAYMENT GATEWAY BUTTON GOES HERE.
+          This project uses Razorpay's no-code Payment Button, which needs
+          no backend server — perfect for a GitHub Pages site.
+          Follow the README to swap in your own button ID.
+          Until you do, this shows a placeholder so the site still works.
+        -->
+        <div id="razorpay-button-container" class="razorpay-slot">
+          <button type="button" class="btn btn-amber full" id="placeholder-pay-btn">
+            Continue to payment →
+          </button>
+          <p class="razorpay-note">Payment gateway connects here — see README "Step 7".</p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <div>
+        <span class="brand-mark">RP</span>
+        <span class="brand-name">RoadPass</span>
+      </div>
+      <p>Built as a learning project · Replace vehicle photos and payment details before going live.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

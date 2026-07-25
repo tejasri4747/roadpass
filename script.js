@@ -1,4 +1,22 @@
 /* =========================================================
+   AUTH CHECK
+========================================================= */
+const currentUser = JSON.parse(localStorage.getItem("roadpass_user"));
+const dashboardLink = document.getElementById("dashboard-link");
+const authLink = document.getElementById("auth-link");
+const logoutHeaderBtn = document.getElementById("logout-header-btn");
+
+if (currentUser) {
+  authLink.style.display = "none";
+  dashboardLink.style.display = "block";
+  logoutHeaderBtn.style.display = "block";
+  logoutHeaderBtn.addEventListener("click", () => {
+    localStorage.removeItem("roadpass_user");
+    window.location.reload();
+  });
+}
+
+/* =========================================================
    VEHICLE DATA
    Replace the "img" links and names with your own shop's
    real photos and vehicle names whenever you're ready.
@@ -122,14 +140,40 @@ numDays.addEventListener("input", updateTotal);
 document.getElementById("pay-btn").addEventListener("click", () => {
   const name = document.getElementById("cust-name").value;
   const phone = document.getElementById("cust-phone").value;
+  const tripType = document.getElementById("trip-type").value;
+  const days = parseInt(document.getElementById("num-days").value);
   
   if (!name || !phone) {
     alert("Please fill in your name and phone number first.");
     return;
   }
 
-  alert(`✓ Demo Payment Successful!\n\nName: ${name}\nPhone: ${phone}\nAmount: ${totalAmount.textContent}\n\nTo enable real payments, add your Razorpay Key ID to the code.`);
+  const ratePerDay = tripType;
+  const total = `₹${ratePerDay * days}`;
+  const booking = {
+    bookingId: "BP-" + Date.now().toString().slice(-8),
+    vehicleId: currentVehicle.id,
+    vehicleName: currentVehicle.name,
+    vehicleImg: currentVehicle.img,
+    category: currentVehicle.category,
+    ratePerDay: ratePerDay,
+    days: days,
+    tripType: tripType === "500" ? "Within city" : "50km+",
+    total: total,
+    startDate: new Date().toISOString(),
+    endDate: new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString(),
+    bookedDate: new Date().toISOString(),
+    status: "Confirmed",
+    customerName: name,
+    customerPhone: phone
+  };
+
+  // Save booking
+  const bookings = JSON.parse(localStorage.getItem("roadpass_bookings")) || [];
+  bookings.push(booking);
+  localStorage.setItem("roadpass_bookings", JSON.stringify(bookings));
+
+  alert(`✓ Booking Confirmed!\n\nBooking ID: ${booking.bookingId}\nVehicle: ${booking.vehicleName}\nDays: ${days}\nTotal: ${total}\n\nCheck your dashboard for invoice & details.`);
   
-  // Close the modal
-  document.getElementById("modal-overlay").classList.remove("open");
+  overlay.classList.remove("open");
 });

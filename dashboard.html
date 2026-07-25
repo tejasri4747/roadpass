@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoadPass — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap header-row">
+      <div class="brand">
+        <span class="brand-mark">RP</span>
+        <span class="brand-name">RoadPass</span>
+      </div>
+      <nav class="main-nav">
+        <a href="index.html">Book Vehicle</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#reviews">Reviews</a>
+      </nav>
+      <button id="logout-btn" class="btn btn-ghost small">Logout</button>
+    </div>
+  </header>
+
+  <section class="dashboard-section">
+    <div class="wrap">
+      <div class="dashboard-header">
+        <div>
+          <h1>Welcome, <span id="user-name">User</span>!</h1>
+          <p id="user-email" class="eyebrow"></p>
+        </div>
+        <a href="index.html" class="btn btn-amber">Book New Vehicle</a>
+      </div>
+
+      <!-- TABS -->
+      <div class="dashboard-tabs">
+        <button class="dash-tab active" data-section="bookings">My Bookings</button>
+        <button class="dash-tab" data-section="documents">Documents</button>
+        <button class="dash-tab" data-section="reviews">Reviews</button>
+        <button class="dash-tab" data-section="settings">Settings</button>
+      </div>
+
+      <!-- BOOKINGS SECTION -->
+      <div id="bookings-section" class="dash-content active">
+        <div class="section-head">
+          <h2>Your Bookings</h2>
+        </div>
+        <div id="bookings-list" class="bookings-grid">
+          <!-- Bookings populate here -->
+        </div>
+      </div>
+
+      <!-- DOCUMENTS SECTION -->
+      <div id="documents-section" class="dash-content">
+        <div class="section-head">
+          <h2>Upload Documents</h2>
+          <p>Required for vehicle rental verification</p>
+        </div>
+        <div class="doc-form">
+          <label class="doc-upload">
+            <span>📄 Aadhar Card</span>
+            <input type="file" id="aadhar-input" accept="image/*">
+            <div id="aadhar-preview" class="doc-preview"></div>
+          </label>
+          <label class="doc-upload">
+            <span>🪪 Driving License</span>
+            <input type="file" id="license-input" accept="image/*">
+            <div id="license-preview" class="doc-preview"></div>
+          </label>
+          <button class="btn btn-amber" id="save-docs-btn">Save Documents</button>
+        </div>
+      </div>
+
+      <!-- REVIEWS SECTION -->
+      <div id="reviews-section" class="dash-content">
+        <div class="section-head">
+          <h2>Write a Review</h2>
+        </div>
+        <form id="review-form" class="review-form">
+          <label>
+            Rating
+            <div class="star-rating">
+              <input type="radio" name="rating" value="5" id="star5">
+              <label for="star5">★</label>
+              <input type="radio" name="rating" value="4" id="star4">
+              <label for="star4">★</label>
+              <input type="radio" name="rating" value="3" id="star3">
+              <label for="star3">★</label>
+              <input type="radio" name="rating" value="2" id="star2">
+              <label for="star2">★</label>
+              <input type="radio" name="rating" value="1" id="star1">
+              <label for="star1">★</label>
+            </div>
+          </label>
+          <label>
+            Review
+            <textarea id="review-text" placeholder="Share your experience..." required></textarea>
+          </label>
+          <button type="submit" class="btn btn-amber">Post Review</button>
+        </form>
+
+        <div class="section-head" style="margin-top: 40px;">
+          <h2>Recent Reviews</h2>
+        </div>
+        <div id="reviews-list" class="reviews-grid">
+          <!-- Reviews populate here -->
+        </div>
+      </div>
+
+      <!-- SETTINGS SECTION -->
+      <div id="settings-section" class="dash-content">
+        <div class="section-head">
+          <h2>Account Settings</h2>
+        </div>
+        <form id="settings-form" class="settings-form">
+          <label>
+            Name
+            <input type="text" id="settings-name">
+          </label>
+          <label>
+            Email
+            <input type="email" id="settings-email">
+          </label>
+          <label>
+            Phone
+            <input type="tel" id="settings-phone">
+          </label>
+          <button type="submit" class="btn btn-amber">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

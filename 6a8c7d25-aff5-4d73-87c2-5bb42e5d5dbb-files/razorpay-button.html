@@ -1,0 +1,33 @@
+<!--
+  RAZORPAY PAYMENT BUTTON — drop-in snippet
+
+  1. Go to https://dashboard.razorpay.com
+  2. Click "Payment Button" in the left menu → "Create Payment Button"
+  3. Give it a name (e.g. "RoadPass Booking"), set an amount or let
+     the customer enter one, and save it
+  4. Razorpay will show you a <script> snippet that looks like the
+     one below, but with YOUR real button ID inside data-payment_button_id
+  5. Copy YOUR version of this whole <form> block
+  6. Open index.html, find this section:
+
+       <div id="razorpay-button-container" class="razorpay-slot">
+         <button type="button" class="btn btn-amber full" id="placeholder-pay-btn">
+           Continue to payment →
+         </button>
+         <p class="razorpay-note">Payment gateway connects here — see README "Step 7".</p>
+       </div>
+
+  7. Replace everything inside that <div> with your copied <form> block
+  8. Delete the placeholder-pay-btn code at the bottom of script.js
+     (the block starting with document.getElementById("placeholder-pay-btn"))
+  9. Commit the changes on GitHub — your button now opens a real
+     Razorpay checkout screen
+-->
+
+<form>
+  <script
+    src="https://checkout.razorpay.com/v1/payment-button.js"
+    data-payment_button_id="REPLACE_WITH_YOUR_BUTTON_ID"
+    async
+  ></script>
+</form>

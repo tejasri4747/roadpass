@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  server:
+    build: ./server
+    ports:
+      - "3000:3000"
+    environment:
+      - JWT_SECRET=replace_with_secret
+    volumes:
+      - ./server/uploads:/app/uploads
+      - ./server/roadpass.db:/app/roadpass.db
+    restart: unless-stopped

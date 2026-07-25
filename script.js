@@ -153,21 +153,48 @@ function updateUserUI() {
   }
 }
 
-loginBtn.addEventListener('click', () => {
+loginBtn.addEventListener('click', async () => {
   let u = loadUser();
   if (u) {
     const ok = confirm('Log out ' + u.name + '?');
-    if (ok) { localStorage.removeItem('roadpass_user'); currentUser = null; updateUserUI(); }
+    if (ok) { localStorage.removeItem('roadpass_user'); localStorage.removeItem('roadpass_token'); currentUser = null; updateUserUI(); }
     return;
   }
-  const name = prompt('Enter your name (demo)');
-  if (!name) return;
+  const haveAccount = confirm('Do you already have an account? OK = Login, Cancel = Register');
   const phone = prompt('Enter your phone (10 digits)');
   if (!phone) return;
-  const user = { name, phone };
-  saveUser(user);
-  currentUser = user;
-  updateUserUI();
+  if (haveAccount) {
+    const password = prompt('Password');
+    if (!password) return;
+    try {
+      const res = await fetch((API_BASE || '') + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, password }) });
+      if (!res.ok) { const err = await res.json().catch(()=>({})); alert('Login failed: ' + (err.error || res.statusText)); return; }
+      const data = await res.json();
+      localStorage.setItem('roadpass_token', data.token);
+      saveUser({ name: data.name, phone: data.phone });
+      currentUser = { name: data.name, phone: data.phone };
+      updateUserUI();
+      alert('Logged in as ' + data.name);
+    } catch (e) { alert('Login failed (server unreachable)'); }
+    return;
+  }
+  // register
+  const name = prompt('Your name');
+  const password = prompt('Choose a password');
+  if (!name || !password) return;
+  try {
+    const res = await fetch((API_BASE || '') + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, phone, password }) });
+    if (!res.ok) { const err = await res.json().catch(()=>({})); alert('Register failed: ' + (err.error || res.statusText)); return; }
+    alert('Registered — logging in...');
+    const res2 = await fetch((API_BASE || '') + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, password }) });
+    if (!res2.ok) { alert('Login after register failed'); return; }
+    const d = await res2.json();
+    localStorage.setItem('roadpass_token', d.token);
+    saveUser({ name: d.name, phone: d.phone });
+    currentUser = { name: d.name, phone: d.phone };
+    updateUserUI();
+    alert('Logged in as ' + d.name);
+  } catch (e) { alert('Register failed (server unreachable)'); }
 });
 
 accountBtn.addEventListener('click', () => {
@@ -200,21 +227,56 @@ numDays.addEventListener("input", updateTotal);
 startDate?.addEventListener('change', updateTotal);
 endDate?.addEventListener('change', updateTotal);
 
-function saveBookingRecord(b) {
+// API base: if served via file://, default to localhost:3000
+const API_BASE = (window.API_BASE) ? window.API_BASE : (location.protocol === 'file:' ? 'http://localhost:3000' : '');
+
+function apiFetch(path, opts = {}) {
+  const token = localStorage.getItem('roadpass_token');
+  const headers = opts.headers || {};
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return fetch(API_BASE + path, Object.assign({}, opts, { headers }));
+}
+
+async function saveBookingRecord(b) {
+  // try server first
+  try {
+    const res = await apiFetch('/api/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+    if (res.ok) return true;
+  } catch (e) { /* fallback to client */ }
+  // fallback: localStorage
   const key = 'roadpass_bookings';
   const existing = JSON.parse(localStorage.getItem(key) || '[]');
   existing.push(b);
   localStorage.setItem(key, JSON.stringify(existing));
+  return false;
 }
 
-function saveReviewRecord(r) {
+async function saveReviewRecord(r) {
+  try {
+    const res = await apiFetch('/api/reviews', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(r) });
+    if (res.ok) return true;
+  } catch (e) {}
   const key = 'roadpass_reviews';
   const existing = JSON.parse(localStorage.getItem(key) || '[]');
   existing.push(r);
   localStorage.setItem(key, JSON.stringify(existing));
+  return false;
 }
 
-function generateInvoice(booking) {
+function openInvoiceUrl(invoiceId) {
+  // prefer server PDF endpoint
+  const url = API_BASE ? (API_BASE + '/api/invoice/' + invoiceId) : null;
+  if (url) { window.open(url, '_blank'); return; }
+  // fallback: client-side printable invoice
+  generateInvoiceClientFallback(invoiceId);
+}
+
+function generateInvoiceClientFallback(invoiceId) {
+  // try to find booking locally
+  const key = 'roadpass_bookings';
+  const all = JSON.parse(localStorage.getItem(key) || '[]');
+  const booking = all.find(b => b.invoiceId === invoiceId);
+  if (!booking) { alert('Invoice not available offline'); return; }
   const w = window.open('', '_blank');
   const html = `
     <html><head><title>Invoice ${booking.invoiceId}</title>
@@ -237,15 +299,38 @@ function generateInvoice(booking) {
   w.document.close();
 }
 
-function renderBookings() {
+async function renderBookings() {
+  bookingsList.innerHTML = '<p>Loading…</p>';
+  const user = loadUser();
+  if (!user) { bookingsList.innerHTML = '<p>Please login to see bookings.</p>'; return; }
+  // try server
+  try {
+    const res = await apiFetch('/api/bookings');
+    if (res.ok) {
+      const list = await res.json();
+      if (!list.length) { bookingsList.innerHTML = '<p>No bookings yet.</p>'; return; }
+      bookingsList.innerHTML = '';
+      list.forEach(b => {
+        const el = document.createElement('div');
+        el.style.border = '1px dashed rgba(255,255,255,0.06)';
+        el.style.padding = '10px';
+        el.style.marginBottom = '10px';
+        el.innerHTML = `<strong>${b.vehicleName} (${b.vehicleId})</strong><br>
+          ${b.startDate} → ${b.endDate} · ${b.days} days · ${b.amount}<br>
+          <small>Booked: ${new Date(b.createdAt).toLocaleString()}</small>
+          <div style="margin-top:8px"><button class="btn btn-ghost small" data-invoice="${b.invoiceId}">Download Invoice</button></div>`;
+        const btn = el.querySelector('button[data-invoice]');
+        btn.addEventListener('click', () => openInvoiceUrl(b.invoiceId));
+        bookingsList.appendChild(el);
+      });
+      return;
+    }
+  } catch (e) { /* fallback */ }
+  // fallback: show localStorage bookings for this user
   const key = 'roadpass_bookings';
   const all = JSON.parse(localStorage.getItem(key) || '[]');
-  const u = loadUser();
-  const list = all.filter(b => u && b.phone === u.phone);
-  if (!list.length) {
-    bookingsList.innerHTML = '<p>No bookings yet. Book a ride to see it here.</p>';
-    return;
-  }
+  const list = all.filter(b => b.phone === user.phone);
+  if (!list.length) { bookingsList.innerHTML = '<p>No bookings yet.</p>'; return; }
   bookingsList.innerHTML = '';
   list.reverse().forEach(b => {
     const el = document.createElement('div');
@@ -257,12 +342,33 @@ function renderBookings() {
       <small>Booked: ${new Date(b.createdAt).toLocaleString()}</small>
       <div style="margin-top:8px"><button class="btn btn-ghost small" data-invoice="${b.invoiceId}">Download Invoice</button></div>`;
     const btn = el.querySelector('button[data-invoice]');
-    btn.addEventListener('click', () => generateInvoice(b));
+    btn.addEventListener('click', () => openInvoiceUrl(b.invoiceId));
     bookingsList.appendChild(el);
   });
 }
 
-function renderShopReviews() {
+async function renderShopReviews() {
+  shopReviews.innerHTML = '<p>Loading…</p>';
+  try {
+    const res = await apiFetch('/api/reviews');
+    if (res.ok) {
+      const all = await res.json();
+      if (!all.length) { shopReviews.innerHTML = '<p>No reviews yet.</p>'; return; }
+      const avg = (all.reduce((s,r)=>s+Number(r.rating),0)/all.length).toFixed(1);
+      shopReviews.innerHTML = `<p>Average rating: ${avg} / 5 (${all.length} reviews)</p>`;
+      const container = document.createElement('div');
+      all.slice(0,5).forEach(r => {
+        const d = document.createElement('div');
+        d.style.borderTop = '1px solid rgba(255,255,255,0.04)';
+        d.style.padding = '8px 0';
+        d.innerHTML = `<strong>${r.name}</strong> · ${r.rating}/5<br><small>${r.text || ''}</small>`;
+        container.appendChild(d);
+      });
+      shopReviews.appendChild(container);
+      return;
+    }
+  } catch (e) {}
+  // fallback: localStorage
   const key = 'roadpass_reviews';
   const all = JSON.parse(localStorage.getItem(key) || '[]');
   if (!all.length) { shopReviews.innerHTML = '<p>No reviews yet.</p>'; return; }
@@ -280,7 +386,7 @@ function renderShopReviews() {
 }
 
 // Payment handling: collect fields, mock success, persist booking & review, generate invoice
-document.getElementById("pay-btn").addEventListener("click", () => {
+document.getElementById("pay-btn").addEventListener("click", async () => {
   const user = loadUser();
   const name = document.getElementById("cust-name").value;
   const phone = document.getElementById("cust-phone").value;
@@ -313,14 +419,26 @@ document.getElementById("pay-btn").addEventListener("click", () => {
   // mock payment success
   alert(`✓ Demo Payment Successful!\n\nName: ${name}\nPhone: ${phone}\nAmount: ${amount}`);
 
-  saveBookingRecord(booking);
+  await saveBookingRecord(booking);
 
   // save review if provided
   const rating = ratingInput && ratingInput.value ? ratingInput.value : null;
   const text = reviewInput && reviewInput.value ? reviewInput.value.trim() : '';
   if (rating || text) {
-    saveReviewRecord({ vehicleId: currentVehicle.id, name, rating: rating || 5, text, createdAt: Date.now() });
+    await saveReviewRecord({ vehicleId: currentVehicle.id, name, rating: rating || 5, text, createdAt: Date.now() });
   }
+
+  // upload files if present
+  try {
+    if (aadharFile.files && aadharFile.files[0]) {
+      const fd = new FormData(); fd.append('file', aadharFile.files[0]);
+      await apiFetch('/api/upload', { method: 'POST', body: fd });
+    }
+    if (licenseFile.files && licenseFile.files[0]) {
+      const fd2 = new FormData(); fd2.append('file', licenseFile.files[0]);
+      await apiFetch('/api/upload', { method: 'POST', body: fd2 });
+    }
+  } catch (e) { console.warn('Upload failed, continuing offline'); }
 
   // Close the booking modal
   document.getElementById("modal-overlay").classList.remove("open");
@@ -328,8 +446,8 @@ document.getElementById("pay-btn").addEventListener("click", () => {
   // ensure user stored
   if (!user) { saveUser({ name, phone }); currentUser = { name, phone }; updateUserUI(); }
 
-  // open invoice
-  generateInvoice(booking);
+  // open invoice (server if available)
+  openInvoiceUrl(invoiceId);
 
   // update account UI
   updateUserUI();
